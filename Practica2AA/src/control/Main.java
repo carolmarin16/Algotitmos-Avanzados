@@ -215,9 +215,9 @@ public class Main implements Notificar {
                 double c = ms / (double) nodos;
 
                 int totalCaselles = dat.getDimensio() * dat.getDimensio() - dat.getNumPeces();
-                double tempsPrevisio = totalCaselles / (double) nps;
+                double tempsPrevisio = (nps > 0) ? (totalCaselles / (double) nps) : Double.POSITIVE_INFINITY;
 
-                gui.actualitzarEstadistica(tempsReal, c / 1e9, tempsPrevisio);
+                gui.actualitzarEstadistica(tempsReal, c / 1000.0, tempsPrevisio);
                 gui.actualitzarVelocitat(nps);
             }
         } catch (Exception e) {

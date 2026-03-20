@@ -1,14 +1,13 @@
 package vista;
 
 import control.Notificar;
-import model.Dades;
-import model.peces.Peca;
-
 import java.awt.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
+import model.Dades;
+import model.peces.Peca;
 
 /**
  * Panel lateral: selecció de N peces, mida del tauler i estadístiques.
@@ -235,7 +234,7 @@ public class PanelConfiguracio extends JPanel {
         panel.add(Box.createVerticalStrut(2));
 
         // Constant multiplicativa
-        lblConstant = miniLabel("Constant C: —");
+        lblConstant = miniLabel("Constant C (s/node): —");
         lblConstant.setAlignmentX(LEFT_ALIGNMENT);
         panel.add(lblConstant);
         panel.add(Box.createVerticalStrut(2));
@@ -298,14 +297,36 @@ public class PanelConfiguracio extends JPanel {
         }
 
         lblTempsReal.setText("Temps real: " + formatTemps(tempsReal));
-        lblConstant.setText(String.format("Constant C: %.3e", constant));
+        lblConstant.setText("Constant C: " + formatConstantPerNode(constant));
         lblTempsPrevist.setText("Temps previst: " + formatTemps(tempsPrevision));
+    }
+
+    /**
+     * Formata la constant per node amb unitats adaptatives.
+     */
+    private String formatConstantPerNode(double secondsPerNode) {
+        if (!Double.isFinite(secondsPerNode) || secondsPerNode < 0) {
+            return "—";
+        }
+        if (secondsPerNode < 1e-6) {
+            return String.format("%.3f ns/node", secondsPerNode * 1e9);
+        }
+        if (secondsPerNode < 1e-3) {
+            return String.format("%.3f us/node", secondsPerNode * 1e6);
+        }
+        if (secondsPerNode < 1) {
+            return String.format("%.3f ms/node", secondsPerNode * 1e3);
+        }
+        return String.format("%.3f s/node", secondsPerNode);
     }
 
     /**
      * Formatea el temps en segons a un format llegible (ms o s).
      */
     private String formatTemps(double segundos) {
+        if (!Double.isFinite(segundos)) {
+            return "∞";
+        }
         if (segundos < 0.001) {
             return String.format("%.4f ms", segundos * 1000);
         } else if (segundos < 1) {
