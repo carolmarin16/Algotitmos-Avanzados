@@ -1,14 +1,15 @@
 package vista;
 
 import control.Notificar;
-import model.Dades;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.net.URL;
 import java.util.Hashtable;
 import javax.swing.*;
 import javax.swing.event.*;
+import model.Dades;
+import vista.dialegs.IntroduirPosicions;
+import vista.dialegs.Modal;
 
 /**
  * Classe principal de la interfície gràfica. Gestiona la finestra principal,
@@ -76,6 +77,7 @@ public class Gui implements ActionListener, ChangeListener {
         toolbar.setFloatable(false);
         toolbar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
         contenidor.add(toolbar, BorderLayout.NORTH);
+        inicialitzarOpcionsBarra();
 
         // ── Panell central (tauler) + panell lateral (configuració)
         central = new PanelCentral(dat);
@@ -98,6 +100,20 @@ public class Gui implements ActionListener, ChangeListener {
 
         // ── Panell inferior: control d'animació + barra d'estat (SOUTH)
         contenidor.add(crearPanelSur(), BorderLayout.SOUTH);
+    }
+
+    /**
+     * Afegeix les opcions estàndard de la barra principal.
+     */
+    private void inicialitzarOpcionsBarra() {
+        posarOpcio("bombeta.png", "barra:calcular",
+                "Resoldre el problema", "Resoldre");
+        posarOpcio("aturar.png", "barra:aturar",
+                "Aturar l'algorisme en curs", "Aturar");
+        posarOpcio("netejar.png", "barra:netejar",
+                "Netejar el tauler", "Netejar");
+        posarOpcio("sortir.png", "barra:sortir",
+                "Tancar l'aplicació", "Sortir");
     }
 
     /**
@@ -317,6 +333,27 @@ public class Gui implements ActionListener, ChangeListener {
         if (statusLabel != null) {
             statusLabel.setText(msg);
         }
+    }
+
+    /**
+     * Mostra un diàleg modal informatiu.
+     */
+    public void mostrarModal(String missatge) {
+        new Modal(prog, missatge).setVisible(true);
+    }
+
+    /**
+     * Demana a l'usuari la posició inicial d'una peça.
+     */
+    public int[] demanarPosicioInicial(int numPeca, int totalPeces, int dimMax) {
+        return IntroduirPosicions.demanarPosicio(numPeca, totalPeces, dimMax);
+    }
+
+    /**
+     * Mostra un error de validació d'entrada de posicions.
+     */
+    public void mostrarErrorPosicio(String msg) {
+        IntroduirPosicions.mostrarError(msg);
     }
 
     /**

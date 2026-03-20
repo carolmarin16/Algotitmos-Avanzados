@@ -1,12 +1,13 @@
 package model;
 
+import control.MeuErrors;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import model.peces.Peca;
-import control.MeuErrors;
+
 /**
  * Clase que gestiona les dades del joc dels escacs algorítmic.
  *
@@ -305,6 +306,45 @@ public class Dades {
     }
 
     /**
+     * Valida una posició inicial manual per a una peça concreta.
+     *
+     * @param idx índex de la peça a validar
+     * @param fila fila proposada
+     * @param col columna proposada
+     * @return null si és vàlida; en cas contrari, missatge d'error
+     */
+    public String validarPosicioIniciUsuari(int idx, int fila, int col) {
+        if (idx < 0 || idx >= posicionsIniciUsuari.length) {
+            return "Índex de peça no vàlid.";
+        }
+        if (fila < 0 || fila >= dimensio || col < 0 || col >= dimensio) {
+            return "Valors fora de rang (0 - " + (dimensio - 1) + ")";
+        }
+
+        for (int j = 0; j < posicionsIniciUsuari.length; j++) {
+            if (j == idx) {
+                continue;
+            }
+
+            int fAlt = posicionsIniciUsuari[j][0];
+            int cAlt = posicionsIniciUsuari[j][1];
+            if (fAlt < 0 || cAlt < 0) {
+                continue;
+            }
+
+            if (fAlt == fila && cAlt == col) {
+                return "Casella ja usada per la peça " + (j + 1);
+            }
+
+            if (capturaMutua(idx, fila, col, j, fAlt, cAlt)) {
+                return "Posició no vàlida: la peça " + (idx + 1)
+                        + " capturaria la peça " + (j + 1);
+            }
+        }
+        return null;
+    }
+
+    /**
      * Mètode getPosicionsIniciUsuari.
      *
      * @return
@@ -316,6 +356,23 @@ public class Dades {
             copia[i][1] = posicionsIniciUsuari[i][1];
         }
         return copia;
+    }
+
+    /**
+     * Indica si totes les posicions inicials manuals estan definides.
+     *
+     * @return true si totes les peces tenen fila i columna vàlides
+     */
+    public boolean posicionsIniciUsuariCompletes() {
+        if (posicionsIniciUsuari == null || posicionsIniciUsuari.length != peces.size()) {
+            return false;
+        }
+        for (int[] pos : posicionsIniciUsuari) {
+            if (pos[0] < 0 || pos[1] < 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -469,22 +526,30 @@ public class Dades {
         return taulell[i][j];
     }
 
-    /** Retorna el pas actual del recorregut. */
+    /**
+     * Retorna el pas actual del recorregut.
+     */
     public int getCaselles() {
         return caselles;
     }
 
-    /** Posa a zero el comptador de passos. */
+    /**
+     * Posa a zero el comptador de passos.
+     */
     public void resetCaselles() {
         caselles = 0;
     }
 
-    /** Incrementa el comptador i retorna el nou valor (pre-increment). */
+    /**
+     * Incrementa el comptador i retorna el nou valor (pre-increment).
+     */
     public int incrementarCaselles() {
         return ++caselles;
     }
 
-    /** Decrementa el comptador de passos (backtracking). */
+    /**
+     * Decrementa el comptador de passos (backtracking).
+     */
     public void decrementarCaselles() {
         caselles--;
     }
@@ -500,7 +565,9 @@ public class Dades {
      * Retorna la solució desada (còpia defensiva).
      */
     public int[][] getSolucio() {
-        if (solucio == null) return null;
+        if (solucio == null) {
+            return null;
+        }
         return copiarMatriu(solucio);
     }
 
@@ -515,11 +582,15 @@ public class Dades {
      * Retorna el nombre total de passos de la solució desada.
      */
     public int getTotalPassosSolucio() {
-        if (solucio == null) return 0;
+        if (solucio == null) {
+            return 0;
+        }
         int total = 0;
-        for (int[] fila : solucio)
-            for (int v : fila)
+        for (int[] fila : solucio) {
+            for (int v : fila) {
                 total = Math.max(total, v);
+            }
+        }
         return total;
     }
 
@@ -586,8 +657,9 @@ public class Dades {
 
     private int[][] copiarMatriu(int[][] m) {
         int[][] copia = new int[m.length][];
-        for (int i = 0; i < m.length; i++)
+        for (int i = 0; i < m.length; i++) {
             copia[i] = m[i].clone();
+        }
         return copia;
     }
 
